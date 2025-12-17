@@ -2,149 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English-Hebrew Learning Dashboard</title>
+    <title>English Dashboard</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f8ff;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 { color: #2c3e50; }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .section-title {
-            background-color: #ffcc00; /* Matches the book header color */
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 30px;
-            font-size: 1.5em;
-            color: #333;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            padding: 20px;
-        }
-        .card {
-            background-color: white;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            padding: 15px;
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .card:hover {
-            transform: scale(1.05);
-            background-color: #e6f7ff;
-            border-color: #007bff;
-        }
-        .emoji { font-size: 3em; display: block; margin-bottom: 10px;}
-        .english { font-size: 1.4em; font-weight: bold; color: #0056b3; display: block;}
-        .hebrew { font-size: 1.1em; color: #666; direction: rtl; display: block; margin-top: 5px;}
-        
-        /* Volume icon to hint at audio */
-        .icon-sound { font-size: 0.8em; color: #999; margin-top: 5px; }
+        body { font-family: sans-serif; background: #fdfdfd; text-align: center; padding: 20px; }
+        .letter-header { background: #ffcc00; padding: 10px; border-radius: 8px; margin: 20px 0; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .card { border: 1px solid #ddd; border-radius: 10px; padding: 15px; cursor: pointer; background: white; }
+        .card:hover { border-color: #007bff; background: #f0faff; }
+        .heb { display: block; direction: rtl; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🎧 Click to Speak</h1>
-        <p>Click any card to hear the English pronunciation.</p>
+    <h1>🎧 English for Kids</h1>
+    <div id="dashboard"></div>
 
-        <div class="section-title">Letter A</div>
-        <div class="grid" id="grid-a">
-            </div>
-
-        <div class="section-title">Letter B</div>
-        <div class="grid" id="grid-b">
-            </div>
-    </div>
+    <script src="data.js"></script>
 
     <script>
-        // Data derived from your uploaded images
-        const vocabulary = [
-            // Letter A
-            { eng: "add", heb: "להוסיף", icon: "➕", section: "a" },
-            { eng: "afraid", heb: "מפחד/חושש", icon: "😨", section: "a" },
-            { eng: "alligator", heb: "תנין", icon: "🐊", section: "a" },
-            { eng: "and", heb: "ו", icon: "&", section: "a" },
-            { eng: "ant", heb: "נמלה", icon: "🐜", section: "a" },
-            { eng: "apple", heb: "תפוח", icon: "🍎", section: "a" },
-            { eng: "arm", heb: "זרוע", icon: "💪", section: "a" },
-            { eng: "as", heb: "כפי ש", icon: "🔄", section: "a" },
-            { eng: "ask", heb: "לשאול", icon: "❓", section: "a" },
-            { eng: "at", heb: "ב", icon: "📍", section: "a" },
+        function render() {
+            const container = document.getElementById('dashboard');
+            // Grouping logic
+            const groups = {};
+            wordList.forEach(w => {
+                const letter = w.eng[0].toUpperCase();
+                if (!groups[letter]) groups[letter] = [];
+                groups[letter].push(w);
+            });
 
-            // Letter B
-            { eng: "baby", heb: "תינוק", icon: "👶", section: "b" },
-            { eng: "bad", heb: "רע", icon: "👎", section: "b" },
-            { eng: "bag", heb: "תיק", icon: "🎒", section: "b" },
-            { eng: "ball", heb: "כדור", icon: "⚽", section: "b" },
-            { eng: "balloon", heb: "בלון", icon: "🎈", section: "b" },
-            { eng: "banana", heb: "בננה", icon: "🍌", section: "b" },
-            { eng: "bat", heb: "עטלף", icon: "🦇", section: "b" },
-            { eng: "bathroom", heb: "חדר אמבטיה", icon: "🚽", section: "b" },
-            { eng: "bed", heb: "מיטה", icon: "🛌", section: "b" },
-            { eng: "bedroom", heb: "חדר שינה", icon: "💤", section: "b" },
-            { eng: "best", heb: "הכי טוב", icon: "🏆", section: "b" },
-            { eng: "big", heb: "גדול", icon: "🐘", section: "b" },
-            { eng: "bit", heb: "קצת", icon: "🤏", section: "b" },
-            { eng: "black", heb: "שחור", icon: "⬛", section: "b" },
-            { eng: "blue", heb: "כחול", icon: "🔵", section: "b" },
-            { eng: "book", heb: "ספר", icon: "📖", section: "b" },
-            { eng: "both", heb: "שניהם", icon: "👯", section: "b" },
-            { eng: "box", heb: "קופסה", icon: "📦", section: "b" },
-            { eng: "boy", heb: "בן/ילד", icon: "👦", section: "b" },
-            { eng: "bread", heb: "לחם", icon: "🍞", section: "b" }
-        ];
-
-        // Function to create the HTML cards
-        function loadCards() {
-            const gridA = document.getElementById('grid-a');
-            const gridB = document.getElementById('grid-b');
-
-            vocabulary.forEach(word => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => speak(word.eng);
+            Object.keys(groups).sort().forEach(letter => {
+                const div = document.createElement('div');
+                div.innerHTML = `<div class="letter-header">${letter}</div>`;
+                const grid = document.createElement('div');
+                grid.className = 'grid';
                 
-                card.innerHTML = `
-                    <span class="emoji">${word.icon}</span>
-                    <span class="english">${word.eng}</span>
-                    <span class="hebrew">${word.heb}</span>
-                    <div class="icon-sound">🔊 Click to hear</div>
-                `;
-
-                if (word.section === 'a') {
-                    gridA.appendChild(card);
-                } else {
-                    gridB.appendChild(card);
-                }
+                groups[letter].forEach(word => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => {
+                        window.speechSynthesis.cancel();
+                        const msg = new SpeechSynthesisUtterance(word.eng);
+                        msg.lang = 'en-US';
+                        window.speechSynthesis.speak(msg);
+                    };
+                    card.innerHTML = `<div>${word.icon}</div><strong>${word.eng}</strong><span class="heb">${word.heb}</span>`;
+                    grid.appendChild(card);
+                });
+                div.appendChild(grid);
+                container.appendChild(div);
             });
         }
-
-        // Function to handle Text-to-Speech
-        function speak(text) {
-            // Cancel any current speech to avoid overlapping
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US'; // Set to American English
-            utterance.rate = 0.9;     // Slightly slower for better clarity
-            utterance.pitch = 1.1;    // Slightly higher pitch is often friendlier for kids
-            
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // Initialize the page
-        loadCards();
+        render();
     </script>
 </body>
 </html>
