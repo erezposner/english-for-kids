@@ -6,7 +6,7 @@ const wordList = [
     { eng: "and", heb: "ו-", icon: "🔗" },
     { eng: "ant", heb: "נמלה", icon: "🐜" },
     { eng: "apple", heb: "תפוח", icon: "🍎" },
-    { eng: "arm/s", heb: "זרוע/זרועות", icon: "💪" },
+    { eng: "arm", heb: "זרוע", icon: "💪" },
     { eng: "as", heb: "כפי ש", icon: "🔄" },
     { eng: "ask", heb: "לשאול", icon: "❓" },
     { eng: "at", heb: "ב-", icon: "📍" },
